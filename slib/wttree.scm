@@ -103,7 +103,7 @@
 (define wt-tree/min-pair #f)
 (define wt-tree/delete-min #f)
 (define wt-tree/delete-min! #f)
-
+(define wt-tree/valid? #f)
 
 ;; This LET sets all of the above variables.
 
@@ -607,6 +607,23 @@
         (slib:error "The trees" tree1 'and tree2 'have 'incompatible 'types
 		    (tree/type tree1) 'and (tree/type tree2))))
 
+  (define (valid? tree)
+    (let ((root (tree/root tree)))
+      (balanced? root)))
+
+  (define (balanced? n)
+    (or (empty? n)
+	(let ((l (node/l n))
+	      (r (node/r n)))
+	  (and (isBalanced l r) (isBalanced r l)
+	       (balanced? l) (balanced? r)))))
+
+  (define (isBalanced a b)
+    (let ((x (node/size a))
+	  (y (node/size b)))
+      (or (fix:<= (fix:+ x y) 1)
+	  (fix:<= y (fix:* wt-tree-ratio x)))))
+
 ;;;______________________________________________________________________
 ;;;
 ;;;  Export interface
@@ -768,6 +785,11 @@
   ;; than passing <.
   (set! number-wt-type (local:make-wt-tree-type  (lambda (u v) (< u v))))
   (set! string-wt-type (local:make-wt-tree-type  string<?))
+
+  (set! wt-tree/valid?
+        (lambda (tree)
+          (guarantee-tree tree 'wt-tree/valid?)
+          (valid? tree)))
 
   'done)
 
