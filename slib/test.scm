@@ -18,6 +18,13 @@
          ((>= var count) result ...)
        body ...))))
 
+(define-syntax dolist
+  (syntax-rules ()
+    ((_ (var list-form result-form ...) statement ...)
+     (do ((n-list list-form (cdr n-list)))
+         ((null? n-list) result-form ...)
+       (let ((var (car n-list)))
+         statement ...)))))
 ;;
 ;; Utilities for wt-tree
 ;;
@@ -38,9 +45,12 @@
 ;;
 
 (define (run-test lst)
-  (let ((func (car lst))
-	(args (cdr lst)))
-    (apply func (map type-to-data args))))
+  (let* ((func (car lst))
+	 (syms (cdr lst))
+	 (args (map type-to-data syms)))
+    (if (apply func args)
+	#t
+	args)))
 
 (define (type-to-data type)
   (let ((size number-of-tests)) ;; ugh!
@@ -48,7 +58,9 @@
      ((eq? type 'alist)
       (random-alist size))
      ((eq? type 'int)
-      (random-integer size)))))
+      (random-integer size))
+     (else
+      (error "Unknown type: " type)))))
 
 ;;
 ;; property tests
@@ -57,22 +69,34 @@
 (define (prop-alist->wt-tree alst)
   (wt-tree/valid? (from-alist alst)))
 
+(define (prop-wt-tree/delete-min alst)
+  (wt-tree/valid? (wt-tree/delete-min (from-alist alst))))
+
 ;;
 ;; test db
 ;;
 
 (define test-alist
-  (list (list prop-alist->wt-tree 'alist)))
+  (list
+   (list "alist->wt-tree" prop-alist->wt-tree 'alist)
+   (list "wt-tree/delete-min" prop-wt-tree/delete-min 'alist)))
 
 ;;
 ;; main
 ;;
 
-(define number-of-tests 100)
+(define number-of-tests 500)
 
-(let ((x (car test-alist)))
-  (dotimes (i number-of-tests)
-    (if (run-test x)
-	(print "OK")
-	(print "NG"))))
+(dolist (prop test-alist)
+  (let ((tag (car prop))
+	(test (cdr prop)))
+    (format #t "~a: testing ~d cases... " tag number-of-tests)
+    (flush)
+    (dotimes (i number-of-tests)
+       (let ((ret (run-test test)))
+	 (unless (eq? ret #t)
+	    (print ret)
+	    (error "Property invalid"))))
+    (print "Done")
+    (flush)))
 
