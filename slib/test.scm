@@ -44,16 +44,22 @@
 ;; Engine
 ;;
 
-(define (run-test lst)
+(define (ladder i)
+  (let* ((unit (quotient number-of-tests 10))
+	 (size (* unit (+ (quotient i unit) 1))))
+    size))
+
+(define (run-test lst i)
   (let* ((func (car lst))
 	 (syms (cdr lst))
-	 (args (map type-to-data syms)))
+	 (size (ladder i))
+	 (args (map (type-to-data size) syms)))
     (if (apply func args)
 	#t
 	args)))
 
-(define (type-to-data type)
-  (let ((size number-of-tests)) ;; ugh!
+(define (type-to-data size)
+  (lambda (type)
     (cond
      ((eq? type 'alist)
       (random-alist size))
@@ -85,7 +91,7 @@
 ;; main
 ;;
 
-(define number-of-tests 500)
+(define number-of-tests 1000)
 
 (dolist (prop test-alist)
   (let ((tag (car prop))
@@ -93,10 +99,10 @@
     (format #t "~a: testing ~d cases... " tag number-of-tests)
     (flush)
     (dotimes (i number-of-tests)
-       (let ((ret (run-test test)))
+       (let ((ret (run-test test i)))
 	 (unless (eq? ret #t)
-	    (print ret)
+	    (print "FAIL")
+	    (format #t "~d/~d: ~a\n" i number-of-tests ret)
 	    (error "Property invalid"))))
-    (print "Done")
+    (print "PASS")
     (flush)))
-
