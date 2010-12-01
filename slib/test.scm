@@ -32,10 +32,13 @@
 (define (random-alist n)
   (zip (random-list n)))
 
+(define integer-scale 10)
+
 (define (random-list n)
-  (list-tabulate n
-		 (lambda (dummy)
-		   (random-integer n))))
+  (let ((range (* n integer-scale)))
+    (list-tabulate n
+		   (lambda (dummy)
+		     (random-integer range)))))
 
 (define (from-alist al)
   (alist->wt-tree number-wt-type al))
@@ -54,8 +57,10 @@
 ;; Engine
 ;;
 
+(define number-of-range 10)
+
 (define (ladder i)
-  (let* ((unit (quotient number-of-tests 10))
+  (let* ((unit (quotient number-of-tests number-of-range))
 	 (size (* unit (+ (quotient i unit) 1))))
     size))
 
@@ -96,6 +101,11 @@
   (wt-tree/valid? (wt-tree/delete-min (from-alist alst))))
 
 (define (prop-wt-tree/union alst1 alst2)
+  (let ((t1 (from-alist alst1))
+	(t2 (from-alist alst2)))
+    (wt-tree/valid? (wt-tree/union t1 t2))))
+
+(define (prop-wt-tree/union-model alst1 alst2)
   (let* ((l1 (uniq (sort (map car alst1))))
 	 (l2 (uniq (sort (map car alst2))))
 	 (model (sort (lset-union eq? l1 l2)))
@@ -116,24 +126,26 @@
    (list "prop-wt-tree/add" prop-wt-tree/add 'alist 'int 'int)
    (list "prop-wt-tree/lookup" prop-wt-tree/lookup 'alist 'int 'int)
    (list "wt-tree/delete-min" prop-wt-tree/delete-min 'alist)
-   (list "prop-wt-tree/union" prop-wt-tree/union 'alist 'alist)))
+   (list "prop-wt-tree/union" prop-wt-tree/union 'alist 'alist)
+   (list "prop-wt-tree/union-model" prop-wt-tree/union-model 'alist 'alist)))
 
 ;;
 ;; main
 ;;
 
-(define number-of-tests 100)
+(define number-of-tests 300)
 
 (dolist (prop test-alist)
-  (let ((tag (car prop))
-	(test (cdr prop)))
-    (format #t "~a: testing ~d cases... " tag number-of-tests)
-    (flush)
-    (dotimes (i number-of-tests)
-       (let ((ret (run-test test i)))
-	 (unless (eq? ret #t)
-	    (print "FAIL")
-	    (format #t "~d/~d: ~a\n" i number-of-tests ret)
-	    (error "Property invalid"))))
-    (print "PASS")
-    (flush)))
+  (guard (dummy (else '()))
+   (let ((tag (car prop))
+	 (test (cdr prop)))
+     (format #t "~a: testing ~d cases... " tag number-of-tests)
+     (flush)
+     (dotimes (i number-of-tests)
+	(let ((ret (run-test test i)))
+	  (unless (eq? ret #t)
+	     (print "FAIL")
+	     (format #t "~d/~d: ~a\n" i number-of-tests ret)
+	     (raise "Property invalid"))))
+     (print "PASS")
+     (flush))))
