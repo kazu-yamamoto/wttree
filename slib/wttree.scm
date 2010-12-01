@@ -274,25 +274,25 @@
                     (n-join c_k c_v y2 z)))))))
 
   ;; (define-integrable wt-tree-ratio 5)
-  (define wt-tree-ratio 5)
+  (define wt-tree-delta 3)
+  (define wt-tree-gamma 2)
 
   (define (t-join k v l r)
     (define (simple-join) (n-join k v l r))
-    (let ((l_n  (node/size l))
-          (r_n  (node/size r)))
-      (cond ((fix:< (fix:+ l_n r_n) 2)   (simple-join))
-            ((fix:> r_n (fix:* wt-tree-ratio l_n))
+    (let ((l_n  (fix:+ (node/size l) 1))
+          (r_n  (fix:+ (node/size r) 1)))
+      (cond ((fix:> r_n (fix:* wt-tree-delta l_n))
              ;; right is too big
-             (let ((r_l_n  (node/size (node/l r)))
-                   (r_r_n  (node/size (node/r r))))
-               (if (fix:< r_l_n r_r_n)
+             (let ((r_l_n  (fix:+ (node/size (node/l r)) 1))
+                   (r_r_n  (fix:+ (node/size (node/r r)) 1)))
+               (if (fix:< r_l_n (fix:* wt-tree-gamma r_r_n))
                    (single-l k v l r)
                    (double-l k v l r))))
-            ((fix:> l_n (fix:* wt-tree-ratio r_n))
+            ((fix:> l_n (fix:* wt-tree-delta r_n))
              ;; left is too big
-             (let ((l_l_n  (node/size (node/l l)))
-                   (l_r_n  (node/size (node/r l))))
-               (if (fix:< l_r_n l_l_n)
+             (let ((l_l_n  (fix:+ (node/size (node/l l)) 1))
+                   (l_r_n  (fix:+ (node/size (node/r l)) 1)))
+               (if (fix:< l_r_n (fix:* wt-tree-gamma l_l_n))
                    (single-r k v l r)
                    (double-r k v l r))))
             (else
@@ -421,13 +421,13 @@
       (cond ((empty? l)   (node/add r k v))
             ((empty? r)   (node/add l k v))
             (else
-             (let ((n1  (node/size l))
-                   (n2  (node/size r)))
-               (cond ((fix:< (fix:* wt-tree-ratio n1) n2)
+             (let ((n1  (fix:+ (node/size l) 1))
+                   (n2  (fix:+ (node/size r) 1)))
+               (cond ((fix:< (fix:* wt-tree-delta n1) n2)
                       (with-n-node r
                         (lambda (k2 v2 l2 r2)
                           (t-join k2 v2 (node/concat3 k v l l2) r2))))
-                     ((fix:< (fix:* wt-tree-ratio n2) n1)
+                     ((fix:< (fix:* wt-tree-delta n2) n1)
                       (with-n-node l
                         (lambda (k1 v1 l1 r1)
                           (t-join k1 v1 l1 (node/concat3 k v r1 r)))))
@@ -619,10 +619,9 @@
 	       (balanced? l) (balanced? r)))))
 
   (define (isBalanced a b)
-    (let ((x (node/size a))
-	  (y (node/size b)))
-      (or (fix:<= (fix:+ x y) 1)
-	  (fix:<= y (fix:* wt-tree-ratio x)))))
+    (let ((x (fix:+ (node/size a) 1))
+	  (y (fix:+ (node/size b) 1)))
+      (fix:<= y (fix:* wt-tree-delta x))))
 
 ;;;______________________________________________________________________
 ;;;
