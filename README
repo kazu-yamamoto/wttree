@@ -34,10 +34,22 @@ prove it mathematically.
 	Efficient sets: a balancing act,
 	Journal of Functional Programming,
 	Vol 3, No 4, pp 553--562,
-	1993,
+	1993
+
+	http://www.swiss.ai.mit.edu/~adams/BB/
 
 We (Mr. Hirai and me) mathematically proved the original weight
 balanced tree (not Adams's one) is valid only with (3,2) in Coq.
+
+	THIS IS A DRAFT
+
+	Yoichi Hirai and Kazuhiko Yamamoto,
+	"Balance Condition on Weight-Balanced Trees",
+	submitted to Journal of Functional Programming,
+	2010
+
+	http://hagi.is.s.u-tokyo.ac.jp/~yh/bst.pdf
+	http://hagi.is.s.u-tokyo.ac.jp/~yh/Balance.v
 
 To fix "wttree.scm", we should translate the definition of weight from
 "size" to "size + 1" and change the parameters from (5,1) to (3,2).
