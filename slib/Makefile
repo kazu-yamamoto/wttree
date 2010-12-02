@@ -1,5 +1,7 @@
+SCHEME=gosh
+
 all: 
-	gosh test.scm
+	$(SCHEME) test-new.scm
 
 old:
-	sed 's/wttree.scm/wttree-old.scm/' test.scm | gosh
+	$(SCHEME) test-old.scm
