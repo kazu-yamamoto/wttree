@@ -113,7 +113,33 @@
 	 (this (sort (to-list (wt-tree/union t1 t2)))))
     (equal? model this)))
 
-;; wt-tree/intersection, wt-tree/difference
+(define (prop-wt-tree/intersection alst1 alst2)
+  (let ((t1 (from-alist alst1))
+	(t2 (from-alist alst2)))
+    (wt-tree/valid? (wt-tree/intersection t1 t2))))
+
+(define (prop-wt-tree/intersection-model alst1 alst2)
+  (let* ((l1 (uniq (sort (map car alst1))))
+	 (l2 (uniq (sort (map car alst2))))
+	 (model (sort (lset-intersection eq? l1 l2)))
+	 (t1 (from-alist alst1))
+	 (t2 (from-alist alst2))
+	 (this (sort (to-list (wt-tree/intersection t1 t2)))))
+    (equal? model this)))
+
+(define (prop-wt-tree/difference alst1 alst2)
+  (let ((t1 (from-alist alst1))
+	(t2 (from-alist alst2)))
+    (wt-tree/valid? (wt-tree/difference t1 t2))))
+
+(define (prop-wt-tree/difference-model alst1 alst2)
+  (let* ((l1 (uniq (sort (map car alst1))))
+	 (l2 (uniq (sort (map car alst2))))
+	 (model (sort (lset-difference eq? l1 l2)))
+	 (t1 (from-alist alst1))
+	 (t2 (from-alist alst2))
+	 (this (sort (to-list (wt-tree/difference t1 t2)))))
+    (equal? model this)))
 
 ;;
 ;; test db
@@ -126,7 +152,11 @@
    (list "prop-wt-tree/lookup" prop-wt-tree/lookup 'alist 'int 'int)
    (list "wt-tree/delete-min" prop-wt-tree/delete-min 'alist)
    (list "prop-wt-tree/union" prop-wt-tree/union 'alist 'alist)
-   (list "prop-wt-tree/union-model" prop-wt-tree/union-model 'alist 'alist)))
+   (list "prop-wt-tree/union-model" prop-wt-tree/union-model 'alist 'alist)
+   (list "prop-wt-tree/intersection" prop-wt-tree/intersection 'alist 'alist)
+   (list "prop-wt-tree/intersection-model" prop-wt-tree/intersection-model 'alist 'alist)
+   (list "prop-wt-tree/difference" prop-wt-tree/difference 'alist 'alist)
+   (list "prop-wt-tree/difference-model" prop-wt-tree/difference-model 'alist 'alist)))
 
 ;;
 ;; main
