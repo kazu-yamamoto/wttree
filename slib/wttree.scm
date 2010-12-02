@@ -609,19 +609,31 @@
 
   (define (valid? tree)
     (let ((root (tree/root tree)))
-      (balanced? root)))
+      (and (balanced? root)
+	   (ordered? root))))
 
   (define (balanced? n)
+    (define (isBalanced a b)
+      (let ((x (fix:+ (node/size a) 1))
+	    (y (fix:+ (node/size b) 1)))
+	(fix:<= y (fix:* wt-tree-delta x))))
     (or (empty? n)
 	(let ((l (node/l n))
 	      (r (node/r n)))
 	  (and (isBalanced l r) (isBalanced r l)
 	       (balanced? l) (balanced? r)))))
 
-  (define (isBalanced a b)
-    (let ((x (fix:+ (node/size a) 1))
-	  (y (fix:+ (node/size b) 1)))
-      (fix:<= y (fix:* wt-tree-delta x))))
+  (define (ordered? n)
+    (define (isOrdered lo hi m)
+      (if (empty? m)
+	  #t
+	  (let ((k (node/k m))
+		(l (node/l m))
+		(r (node/r m)))
+	    (and (lo k) (hi k)
+		 (isOrdered lo (lambda (x) (< x k)) l)
+		 (isOrdered (lambda (x) (< k x)) hi r)))))
+    (isOrdered (lambda (x) #t) (lambda (x) #t) n))
 
 ;;;______________________________________________________________________
 ;;;
