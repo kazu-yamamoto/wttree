@@ -166,18 +166,18 @@
 (define test-alist
   (list
    (list "alist->wt-tree" prop-alist->wt-tree 'alist)
-   (list "prop-wt-tree/fold" prop-wt-tree/fold 'alist)
-   (list "prop-wt-tree/add" prop-wt-tree/add 'alist 'int 'int)
+   (list "wt-tree/fold" prop-wt-tree/fold 'alist)
+   (list "wt-tree/add" prop-wt-tree/add 'alist 'int 'int)
    (list "wt-tree/delete" prop-wt-tree/delete 'alist)
    (list "wt-tree/delete-min" prop-wt-tree/delete-min 'alist)
-   (list "prop-wt-tree/lookup" prop-wt-tree/lookup 'alist)
-   (list "prop-wt-tree/add-lookup" prop-wt-tree/add-lookup 'alist 'int 'int)
-   (list "prop-wt-tree/union" prop-wt-tree/union 'alist 'alist)
-   (list "prop-wt-tree/union-model" prop-wt-tree/union-model 'alist 'alist)
-   (list "prop-wt-tree/intersection" prop-wt-tree/intersection 'alist 'alist)
-   (list "prop-wt-tree/intersection-model" prop-wt-tree/intersection-model 'alist 'alist)
-   (list "prop-wt-tree/difference" prop-wt-tree/difference 'alist 'alist)
-   (list "prop-wt-tree/difference-model" prop-wt-tree/difference-model 'alist 'alist)))
+   (list "wt-tree/lookup" prop-wt-tree/lookup 'alist)
+   (list "wt-tree/add-lookup" prop-wt-tree/add-lookup 'alist 'int 'int)
+   (list "wt-tree/union" prop-wt-tree/union 'alist 'alist)
+   (list "wt-tree/union-model" prop-wt-tree/union-model 'alist 'alist)
+   (list "wt-tree/intersection" prop-wt-tree/intersection 'alist 'alist)
+   (list "wt-tree/intersection-model" prop-wt-tree/intersection-model 'alist 'alist)
+   (list "wt-tree/difference" prop-wt-tree/difference 'alist 'alist)
+   (list "wt-tree/difference-model" prop-wt-tree/difference-model 'alist 'alist)))
 
 ;;
 ;; main
