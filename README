@@ -1,1 +1,64 @@
-To fix "wt-tree.scm" of MIT/GNU Scheme and slib.
+This package aims to fix the bugs of "wttree.scm" of "MIT/GNU Scheme"
+and "slib".
+
+"wttree.scm" is a finite map (key-value store) which also provides
+set operations. It is based on "weight balanced trees", a variant
+of binary search trees.
+
+The original weight balanced trees is invested by Nievergelt and
+Reingold in 1972. Its weight is "size + 1". The balance algorithm has
+two parameters, delta and gamma. They defined
+(delta,gamma) = (1 + sprt 2, sqrt 2). This algorithm and this parameter
+does not have bugs.
+
+	Nievergelt J. and Reingold E.M.,
+	"Binary search trees of bounded balance",
+	Proceedings of the fourth annual ACM symposium on Theory of computing,
+	pp 137--142,
+	1972
+
+In 1992, Adams created a variant of weight balanced tree. It's weight
+is purely "size". He defined (delta,gamma) = (3 or larger, 1).  The
+pair (delta,gamma) of "wttree.scm" is (5,1). They are all buggy.
+In some cases, the delete operation on a given balanced tree breaks
+its balance. To our test, only (3,2) and (4,2) are valid. But we cannot
+prove it mathematically.
+
+	Adams S.,
+	Implementing sets efficiently in a functional language,
+	Technical Report CSTR 92-10,
+	University of Southampton,
+	1992
+
+	Adams S.,
+	Efficient sets: a balancing act,
+	Journal of Functional Programming,
+	Vol 3, No 4, pp 553--562,
+	1993,
+
+We (Mr. Hirai and me) mathematically proved the original weight
+balanced tree (not Adams's one) is valid only with (3,2) in Coq.
+
+To fix "wttree.scm", we should translate the definition of weight from
+"size" to "size + 1" and change the parameters from (5,1) to (3,2).
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+For slib:
+
+Gauche is required as Scheme implementation.
+
+	% cd slib
+	;; To run tests for the new "wttree.scm"
+	% make
+	;; All property tests are passed.
+
+	;; To run test for the old "wttree.scm"
+	% make old
+	;; Some property tests are failed.
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+For MIT/GNU Scheme:
+
+TBD
