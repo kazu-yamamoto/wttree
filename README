@@ -5,11 +5,12 @@ and "slib".
 set operations. It is based on "weight balanced trees", a variant
 of binary search trees.
 
-The original weight balanced trees is invested by Nievergelt and
+The original weight balanced tree is invested by Nievergelt and
 Reingold in 1972. Its weight is "size + 1". The balance algorithm has
-two parameters, delta and gamma. They defined
-(delta,gamma) = (1 + sprt 2, sqrt 2). This algorithm and this parameter
-does not have bugs.
+two parameters, delta and gamma. 
+They defined (delta,gamma) = (1 + sprt 2, sqrt 2). 
+This algorithm and this parameter does not have bugs. That is, the
+balance of a tree is always maintained.
 
 	Nievergelt J. and Reingold E.M.,
 	"Binary search trees of bounded balance",
@@ -17,11 +18,11 @@ does not have bugs.
 	pp 137--142,
 	1972
 
-In 1992, Adams created a variant of weight balanced tree. It's weight
+In 1992, Adams created a variant of weight balanced tree. Its weight
 is purely "size". He defined (delta,gamma) = (3 or larger, 1).  The
-pair (delta,gamma) of "wttree.scm" is (5,1). They are all buggy.
-In some cases, the delete operation on a given balanced tree breaks
-its balance. To our test, only (3,2) and (4,2) are valid. But we cannot
+pair (delta,gamma) of "wttree.scm" is (5,1). They are all buggy.  In
+some cases, the delete operation on a given balanced tree breaks its
+balance. To our tests, only (3,2) and (4,2) are valid. But we cannot
 prove it mathematically.
 
 	Adams S.,
