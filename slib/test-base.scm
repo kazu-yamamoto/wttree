@@ -89,6 +89,12 @@
 (define (prop-alist->wt-tree alst)
   (wt-tree/valid? (from-alist alst)))
 
+(define (prop-wt-tree/fold alst)
+  (let* ((model (uniq (sort (map car alst))))
+	 (tree (from-alist alst))
+	 (this (to-list tree)))
+    (equal? model this)))
+
 (define (prop-wt-tree/add alst k v)
   (wt-tree/valid? (wt-tree/add (from-alist alst) k v)))
 
@@ -160,6 +166,7 @@
 (define test-alist
   (list
    (list "alist->wt-tree" prop-alist->wt-tree 'alist)
+   (list "prop-wt-tree/fold" prop-wt-tree/fold 'alist)
    (list "prop-wt-tree/add" prop-wt-tree/add 'alist 'int 'int)
    (list "wt-tree/delete" prop-wt-tree/delete 'alist)
    (list "wt-tree/delete-min" prop-wt-tree/delete-min 'alist)
