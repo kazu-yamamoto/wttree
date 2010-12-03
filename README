@@ -74,4 +74,13 @@ Gauche is required as Scheme implementation.
 
 For MIT/GNU Scheme:
 
-TBD
+MIT/GNU Scheme is required as Scheme implementation.
+
+	% cd mit
+	;; To run tests for the new "wttree.scm"
+	% make
+	;; All property tests are passed.
+
+	;; To run test for the old "wttree.scm"
+	% make old
+	;; Some property tests are failed.
