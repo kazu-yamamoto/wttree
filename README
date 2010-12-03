@@ -1,5 +1,5 @@
 This package aims to fix the bugs of "wttree.scm" of "MIT/GNU Scheme"
-and "slib".
+v9.0.1 and "slib" v3b3.
 
 "wttree.scm" is a finite map (key-value store) which also provides
 set operations. It is based on "weight balanced trees", a variant
