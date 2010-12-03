@@ -11,6 +11,8 @@ two parameters, delta and gamma.
 They defined (delta,gamma) = (1 + sprt 2, sqrt 2). 
 This algorithm and this parameter does not have bugs. That is, the
 balance of a tree is always maintained.
+However, since these parameter are not integer, implementation cost is
+high.
 
 	Nievergelt J. and Reingold E.M.,
 	"Binary search trees of bounded balance",
@@ -39,8 +41,9 @@ prove it mathematically.
 
 	http://www.swiss.ai.mit.edu/~adams/BB/
 
-We (Mr. Hirai and me) mathematically proved the original weight
-balanced tree (not Adams's one) is valid only with (3,2) in Coq.
+We (Mr. Hirai and me) mathematically proved in Coq that (3,2) is one
+and only one interger solution for the original weight balanced tree
+(not Adams's one).
 
 	THIS IS A DRAFT
 
