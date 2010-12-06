@@ -24,6 +24,13 @@
          ((null? n-list) result-form ...)
        (let ((var (car n-list)))
          statement ...)))))
+
+(define-syntax block
+  (syntax-rules ()
+    ((_ escape body ...)
+     (call-with-current-continuation
+      (lambda (escape) body ...)))))
+
 ;;
 ;; Utilities for wt-tree
 ;;
@@ -187,17 +194,17 @@
 
 (define (main args)
   (dolist (prop test-alist)
-     (guard (dummy (else '()))
-	(let ((tag (car prop))
-	      (test (cdr prop)))
-	  (format #t "~a: testing ~d cases... " tag number-of-tests)
-	  (flush)
-	  (dotimes (i number-of-tests)
-	     (let ((ret (run-test test i)))
-	       (unless (eq? ret #t)
-		  (print "FAIL")
-		  (format #t "~d/~d: ~a\n" i number-of-tests ret)
-		  (raise "Property invalid"))))
-	  (print "PASS")
-	  (flush))))
+    (let ((tag (car prop))
+	  (test (cdr prop)))
+      (format #t "~a: testing ~d cases... " tag number-of-tests)
+      (flush)
+      (block break
+	(dotimes (i number-of-tests)
+	  (let ((ret (run-test test i)))
+	    (unless (eq? ret #t)
+	      (print "FAIL")
+	      (format #t "~d/~d: ~a\n" i number-of-tests ret)
+	      (break))))
+	(print "PASS")
+	(flush))))
   0)
