@@ -16,9 +16,15 @@
 ;; PERFORMANCE OF THIS SOFTWARE.
 
 ;;
+;; This code is to test "wttree.scm". Test cases are automatically
+;; generated and properties are tested.
+;;
+
+;;
 ;; Preamble
 ;;
 
+(load "./wttree.scm")
 (use srfi-1)
 (use srfi-27)
 (random-source-randomize! default-random-source)
@@ -209,7 +215,7 @@
 
 (define number-of-tests 300)
 
-(define (main args)
+;;(define (main args)
   (dolist (prop test-alist)
     (let ((tag (car prop))
 	  (test (cdr prop)))
@@ -224,4 +230,4 @@
 	      (break))))
 	(print "PASS")
 	(flush))))
-  0)
+;;  0)
