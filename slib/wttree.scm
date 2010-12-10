@@ -1,4 +1,14 @@
 ;;; "wttree.scm" Weight balanced trees			-*-Scheme-*-
+;;;
+;;; Copyright (c) 2010 Kazu Yamamoto
+;;;
+;;; Reference:
+;;;
+;;;   Yoichi Hirai and Kazuhiko Yamamoto,
+;;;   "Balance Condition on Weight-Balanced Trees",
+;;;   submitted to Journal of Functional Programming,
+;;;   2010
+;;;
 ;;; Copyright (c) 1993-1994 Stephen Adams
 ;;;
 ;;; References:
