@@ -88,6 +88,8 @@
     (cond
      ((eq? type 'alist)
       (random-alist size))
+     ((eq? type 'ulist)
+      (uniq (sort1 (random-list size))))
      ((eq? type 'int)
       (random size))
      (else
@@ -99,6 +101,12 @@
 
 (define (prop-alist->wt-tree alst)
   (wt-tree/valid? (from-alist alst)))
+
+(define (prop-wt-tree/index ulst)
+  (let* ((alst (zip ulst ulst))
+	 (tree (from-alist alst))
+	 (idx (quotient (length alst) 2)))
+    (equal? (wt-tree/index tree idx) (list-ref ulst idx))))
 
 (define (prop-wt-tree/fold alst)
   (let* ((model (uniq (sort1 (map car alst))))
@@ -177,6 +185,7 @@
 (define test-alist
   (list
    (list "alist->wt-tree" prop-alist->wt-tree 'alist)
+   (list "wt-tree/index" prop-wt-tree/index 'ulist)
    (list "wt-tree/fold" prop-wt-tree/fold 'alist)
    (list "wt-tree/add" prop-wt-tree/add 'alist 'int 'int)
    (list "wt-tree/delete" prop-wt-tree/delete 'alist)
