@@ -26,8 +26,6 @@
 
 (require 'wt-tree)
 (require 'srfi-1)
-;; (use srfi-27)
-;; (random-source-randomize! default-random-source)
 (require 'random)
 (require 'format)
 (require 'sort)
