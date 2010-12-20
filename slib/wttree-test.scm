@@ -24,35 +24,16 @@
 ;; Preamble
 ;;
 
-(load "./wttree.scm")
-(use srfi-1)
-(use srfi-27)
-(random-source-randomize! default-random-source)
+(require 'wt-tree)
+(require 'srfi-1)
+;; (use srfi-27)
+;; (random-source-randomize! default-random-source)
+(require 'random)
+(require 'format)
+(require 'sort)
 
-;;
-;; Macro
-;;
-
-(define-syntax dotimes
-  (syntax-rules ()
-    ((_ (var count result ...) body ...)
-     (do ((var 0 (+ 1 var)))
-         ((>= var count) result ...)
-       body ...))))
-
-(define-syntax dolist
-  (syntax-rules ()
-    ((_ (var list-form result-form ...) statement ...)
-     (do ((n-list list-form (cdr n-list)))
-         ((null? n-list) result-form ...)
-       (let ((var (car n-list)))
-         statement ...)))))
-
-(define-syntax block
-  (syntax-rules ()
-    ((_ escape body ...)
-     (call-with-current-continuation
-      (lambda (escape) body ...)))))
+(define (sort1 lst)
+  (sort lst <))
 
 ;;
 ;; Utilities for wt-tree
@@ -67,7 +48,7 @@
   (let ((range (* n integer-scale)))
     (list-tabulate n
 		   (lambda (dummy)
-		     (random-integer range)))))
+		     (random range)))))
 
 (define (from-alist al)
   (alist->wt-tree number-wt-type al))
@@ -108,7 +89,7 @@
      ((eq? type 'alist)
       (random-alist size))
      ((eq? type 'int)
-      (random-integer size))
+      (random size))
      (else
       (error "Unknown type: " type)))))
 
@@ -120,7 +101,7 @@
   (wt-tree/valid? (from-alist alst)))
 
 (define (prop-wt-tree/fold alst)
-  (let* ((model (uniq (sort (map car alst))))
+  (let* ((model (uniq (sort1 (map car alst))))
 	 (tree (from-alist alst))
 	 (this (to-list tree)))
     (equal? model this)))
@@ -153,12 +134,12 @@
     (wt-tree/valid? (wt-tree/union t1 t2))))
 
 (define (prop-wt-tree/union-model alst1 alst2)
-  (let* ((l1 (uniq (sort (map car alst1))))
-	 (l2 (uniq (sort (map car alst2))))
-	 (model (sort (lset-union eq? l1 l2)))
+  (let* ((l1 (uniq (sort1 (map car alst1))))
+	 (l2 (uniq (sort1 (map car alst2))))
+	 (model (sort1 (lset-union eq? l1 l2)))
 	 (t1 (from-alist alst1))
 	 (t2 (from-alist alst2))
-	 (this (sort (to-list (wt-tree/union t1 t2)))))
+	 (this (sort1 (to-list (wt-tree/union t1 t2)))))
     (equal? model this)))
 
 (define (prop-wt-tree/intersection alst1 alst2)
@@ -167,12 +148,12 @@
     (wt-tree/valid? (wt-tree/intersection t1 t2))))
 
 (define (prop-wt-tree/intersection-model alst1 alst2)
-  (let* ((l1 (uniq (sort (map car alst1))))
-	 (l2 (uniq (sort (map car alst2))))
-	 (model (sort (lset-intersection eq? l1 l2)))
+  (let* ((l1 (uniq (sort1 (map car alst1))))
+	 (l2 (uniq (sort1 (map car alst2))))
+	 (model (sort1 (lset-intersection eq? l1 l2)))
 	 (t1 (from-alist alst1))
 	 (t2 (from-alist alst2))
-	 (this (sort (to-list (wt-tree/intersection t1 t2)))))
+	 (this (sort1 (to-list (wt-tree/intersection t1 t2)))))
     (equal? model this)))
 
 (define (prop-wt-tree/difference alst1 alst2)
@@ -181,12 +162,12 @@
     (wt-tree/valid? (wt-tree/difference t1 t2))))
 
 (define (prop-wt-tree/difference-model alst1 alst2)
-  (let* ((l1 (uniq (sort (map car alst1))))
-	 (l2 (uniq (sort (map car alst2))))
-	 (model (sort (lset-difference eq? l1 l2)))
+  (let* ((l1 (uniq (sort1 (map car alst1))))
+	 (l2 (uniq (sort1 (map car alst2))))
+	 (model (sort1 (lset-difference eq? l1 l2)))
 	 (t1 (from-alist alst1))
 	 (t2 (from-alist alst2))
-	 (this (sort (to-list (wt-tree/difference t1 t2)))))
+	 (this (sort1 (to-list (wt-tree/difference t1 t2)))))
     (equal? model this)))
 
 ;;
@@ -215,19 +196,26 @@
 
 (define number-of-tests 300)
 
-;;(define (main args)
-  (dolist (prop test-alist)
-    (let ((tag (car prop))
-	  (test (cdr prop)))
-      (format #t "~a: testing ~d cases... " tag number-of-tests)
-      (flush)
-      (block break
-	(dotimes (i number-of-tests)
-	  (let ((ret (run-test test i)))
-	    (unless (eq? ret #t)
-	      (print "FAIL")
-	      (format #t "~d/~d: ~a\n" i number-of-tests ret)
-	      (break))))
-	(print "PASS")
-	(flush))))
-;;  0)
+(define (main . args)
+  (for-each
+   (lambda (prop)
+     (let ((tag (car prop))
+	   (test (cdr prop)))
+       (format #t "~a: testing ~d cases... " tag number-of-tests)
+       (force-output)
+       (let loop ((i 0))
+	 (cond
+	  ((>= i number-of-tests)
+	   (print "PASS")
+	   (force-output))
+	  (else
+	   (let ((ret (run-test test i)))
+	     (cond ((eq? ret #t)
+		    (loop (+ 1 i)))
+		   (else
+		    (print "FAIL")
+		    (format #t "~d/~d: ~a\n" i number-of-tests ret)))))))))
+   test-alist)
+  0)
+
+(main)
