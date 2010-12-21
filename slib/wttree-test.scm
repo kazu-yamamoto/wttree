@@ -72,7 +72,7 @@
 	 (size (* unit (+ (quotient i unit) 1))))
     size))
 
-(define (run-test lst i)
+(define (try-test lst i)
   (let* ((func (car lst))
 	 (syms (cdr lst))
 	 (size (ladder i))
@@ -203,26 +203,23 @@
 
 (define number-of-tests 300)
 
-(define (main . args)
-  (for-each
-   (lambda (prop)
-     (let ((tag (car prop))
-	   (test (cdr prop)))
-       (format #t "~a: testing ~d cases... " tag number-of-tests)
-       (force-output)
-       (let loop ((i 0))
-	 (cond
-	  ((>= i number-of-tests)
-	   (print "PASS")
-	   (force-output))
-	  (else
-	   (let ((ret (run-test test i)))
-	     (cond ((eq? ret #t)
-		    (loop (+ 1 i)))
-		   (else
-		    (print "FAIL")
-		    (format #t "~d/~d: ~a\n" i number-of-tests ret)))))))))
-   test-alist)
-  0)
+(define (run-test prop)
+  (let ((tag (car prop))
+	(test (cdr prop)))
+    (format #t "~a: testing ~d cases... " tag number-of-tests)
+    (force-output)
+    (let loop ((i 0))
+      (cond
+       ((>= i number-of-tests)
+	(display "PASS\n")
+	(force-output))
+       (else
+	(let ((ret (try-test test i)))
+	  (cond
+	   ((eq? ret #t)
+	    (loop (+ 1 i)))
+	   (else
+	    (display "FAIL\n")
+	    (format #t "~d/~d: ~a\n" i number-of-tests ret)))))))))
 
-(main)
+(for-each run-test test-alist)
