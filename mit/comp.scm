@@ -1,0 +1,5 @@
+(cf "wttree.scm")
+(cf "wttree-old.scm")
+(cf "test-base.scm")
+(cf "test-new.scm")
+(cf "test-old.scm")

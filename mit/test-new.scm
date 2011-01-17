@@ -1,2 +1,2 @@
-(load "./wttree.scm")
-(load "./test-base.scm")
+(load "./wttree")
+(load "./test-base")
