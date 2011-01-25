@@ -1,36 +1,31 @@
 ;;
+;; Copyright (C) 2010 Kazu Yamamoto
+;;
+;; Permission to use, copy, modify, and/or distribute this software for
+;; any purpose with or without fee is hereby granted, provided that the
+;; above copyright notice and this permission notice appear in all
+;; copies.
+;;
+;; THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+;; WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+;; WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+;; AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+;; DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+;; PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+;; TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+;; PERFORMANCE OF THIS SOFTWARE.
+
+;;
+;; This code is to test "wttree.scm". Test cases are automatically
+;; generated and properties are tested.
+;;
+
+;;
 ;; Preamble
 ;;
 
-;(use srfi-1)
-;(use srfi-27)
 (load-option 'format)
 (random-source-randomize! default-random-source)
-
-;;
-;; Macro
-;;
-
-(define-syntax dotimes
-  (syntax-rules ()
-    ((_ (var count result ...) body ...)
-     (do ((var 0 (+ 1 var)))
-         ((>= var count) result ...)
-       body ...))))
-
-(define-syntax dolist
-  (syntax-rules ()
-    ((_ (var list-form result-form ...) statement ...)
-     (do ((n-list list-form (cdr n-list)))
-         ((null? n-list) result-form ...)
-       (let ((var (car n-list)))
-         statement ...)))))
-
-(define-syntax block
-  (syntax-rules ()
-    ((_ escape body ...)
-     (call-with-current-continuation
-      (lambda (escape) body ...)))))
 
 (define (sort1 lst)
   (sort lst <))
@@ -74,7 +69,7 @@
 	 (size (* unit (+ (quotient i unit) 1))))
     size))
 
-(define (run-test lst i)
+(define (try-test lst i)
   (let* ((func (car lst))
 	 (syms (cdr lst))
 	 (size (ladder i))
@@ -88,8 +83,10 @@
     (cond
      ((eq? type 'alist)
       (random-alist size))
+     ((eq? type 'ulist)
+      (uniq (sort1 (random-list size))))
      ((eq? type 'int)
-      (random-integer size))
+      (random size))
      (else
       (error "Unknown type: " type)))))
 
@@ -99,6 +96,12 @@
 
 (define (prop-alist->wt-tree alst)
   (wt-tree/valid? (from-alist alst)))
+
+(define (prop-wt-tree/index ulst)
+  (let* ((alst (zip ulst ulst))
+	 (tree (from-alist alst))
+	 (idx (quotient (length alst) 2)))
+    (equal? (wt-tree/index tree idx) (list-ref ulst idx))))
 
 (define (prop-wt-tree/fold alst)
   (let* ((model (uniq (sort1 (map car alst))))
@@ -177,6 +180,7 @@
 (define test-alist
   (list
    (list "alist->wt-tree" prop-alist->wt-tree 'alist)
+   (list "wt-tree/index" prop-wt-tree/index 'ulist)
    (list "wt-tree/fold" prop-wt-tree/fold 'alist)
    (list "wt-tree/add" prop-wt-tree/add 'alist 'int 'int)
    (list "wt-tree/delete" prop-wt-tree/delete 'alist)
@@ -196,19 +200,23 @@
 
 (define number-of-tests 300)
 
-(format #t "\n")
-(dolist (prop test-alist)
-   (let ((tag (car prop))
-	 (test (cdr prop)))
-     (format #t "~A: testing ~A cases... " tag number-of-tests)
-     (flush-output)
-     (block break
-       (dotimes (i number-of-tests)
-	 (let ((ret (run-test test i)))
-	   (if (not (eq? ret #t))
-	       (begin
-		 (format #t "FAIL\n")
-		 (format #t "~A/~A: ~A\n" i number-of-tests ret)
-		 (break 1)))))
-       (format #t "PASS\n")
-       (flush-output))))
+(define (run-test prop)
+  (let ((tag (car prop))
+	(test (cdr prop)))
+    (format #t "~A: testing ~A cases... " tag number-of-tests)
+    (force-output)
+    (let loop ((i 0))
+      (cond
+       ((>= i number-of-tests)
+	(display "PASS\n")
+	(force-output))
+       (else
+	(let ((ret (try-test test i)))
+	  (cond
+	   ((eq? ret #t)
+	    (loop (+ 1 i)))
+	   (else
+	    (display "FAIL\n")
+	    (format #t "~A/~A: ~A\n" i number-of-tests ret)))))))))
+
+(for-each run-test test-alist)
